@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Edit Pics</title>
+    <link href='http://fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic' rel='stylesheet'>
+    <link href="/static/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div class="site">
+    <div class="header">
+        <a href="/">Index</a>
+    </div>
+    <div style="text-align:center">
+        <p><a href="/file">New Pics</a></p>
+    </div>
+    {% for picture in pictures %}
+    <div class="pic">
+        <ul>
+            <li>
+                <div class="leftDiv">
+                    <div class="pictitle">{{ picture.pic_name }}</div>
+                    <a href="http://{{ picture.bucket }}.qiniudn.com/{{ picture.pic_title }}">
+                        <img src="http://{{ picture.bucket }}.qiniudn.com/{{ picture.pic_title }}" width="100px" height="100px" />
+                    </a>
+                </div>
+                <div class="rightDiv">
+                    <a href="/file?id={{ picture.id }}">修改</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    {% end %}
+    <footer>
+        <p><a href="/pics">PIC</a><span>&nbsp;&nbsp;</span><a href="/items">ITEMS</a> <br>
+            Copyright &copy; 2014 OMENGYE</p>
+    </footer>
+</div>
+</body>
+</html>

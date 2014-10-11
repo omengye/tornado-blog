@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Edit Items</title>
+    <link href='http://fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic' rel='stylesheet'>
+    <link href="/static/style.css" rel="stylesheet" type="text/css"/>
+    <style>
+        .leftDiv { width:470px; float:left;}
+        .rightDiv { width:40px; float:right;}
+    </style>
+</head>
+<body>
+<div class="site">
+    <div class="header">
+        <a href="/">Index</a>
+    </div>
+    <div style="text-align:center">
+        <p><a href="/edit">New Items</a></p>
+    </div>
+    {% for entry in entries %}
+    <div class="archive">
+        <ul>
+            <li>
+                <div class="leftDiv">
+                    <a href="/items/{{ entry.slug }}">{{ entry.title }}</a>
+                </div>
+                <div class="rightDiv">
+                    <a href="/edit?id={{ entry.id }}">修改</a>
+                </div>
+                <div class="date">
+                    Published on <strong>{{ locale.format_date(entry.published, full_format=True, shorter=True) }}</strong>
+                </div>
+            </li>
+        </ul>
+    </div>
+    {% end %}
+    <footer>
+        <p><a href="/pics">PIC</a><span>&nbsp;&nbsp;</span><a href="/items">ITEMS</a> <br>
+            Copyright &copy; 2014 OMENGYE</p>
+    </footer>
+</div>
+</body>
+</html>

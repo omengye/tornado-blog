@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Edit Items</title>
+    <link href="/static/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+    <div class="header">
+        <a href="/">Index</a>
+    </div>
+    <div class="archive" style="text-align:center">
+        <form action="{{ request.uri }}" method="post">
+            <div>
+                <input name="title" type="text" style="width:410px;" value="{{ entry['title'] if entry else '' }}" placeholder="标题" />
+            </div>
+            <div style="text-align:center">
+                <textarea name="markdown" rows="25" cols="30" placeholder="内容">{{ entry['markdown'] if entry else '' }}</textarea>
+            </div>
+            <div style="padding:0 0 0 8px">
+                <button type="submit">提交</button>
+                &nbsp;
+            </div>
+            {% module xsrf_form_html() %}
+        </form>
+        {% if entry %}
+            <form action="/delete/items" method="post">
+                <input type="hidden" name="id" value="{{ entry['id'] }}">
+                <button type="submit">删除</button>
+                {% module xsrf_form_html() %}
+            </form>
+        {% end %}
+    </div>
+    <footer>
+        <p><a href="/pics">PIC</a><span>&nbsp;&nbsp;</span><a href="/items">ITEMS</a> <br>
+            Copyright &copy; 2014 OMENGYE</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Upload Pic</title>
+    <link href="/static/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+    <div class="header">
+        <a href="/">Index</a>
+    </div>
+    <div class="archive" style="text-align:center">
+        <form action="{{ request.uri }}" enctype="multipart/form-data" method='post'>
+            <div style="padding:10px">
+                {% if pictures %}
+                    {{ pictures['pic_name'] }}<br>
+                    <a href="http://{{ pictures['bucket'] }}.qiniudn.com/{{ pictures['pic_title'] }}">
+                        <img src="http://{{ pictures['bucket'] }}.qiniudn.com/{{ pictures['pic_title'] }}" width="100px" height="100px" />
+                    </a><br>
+                {% end %}
+                <input type='file' name='file' /><br/>
+            </div>
+            <div>
+                <input name="pic_name" type="text" value="{{ pictures['pic_name'] if pictures else '' }}"  placeholder="标题" />
+            </div>
+            <div>
+                <textarea name="pic_details" rows="15" cols="30" placeholder="内容">{{ pictures['pic_details'] if pictures else '' }}</textarea>
+            </div>
+            <div>
+                <input type='submit' value='submit'/>
+            </div>
+        {% module xsrf_form_html() %}
+        </form>
+        {% if pictures %}
+        <form action="/delete{{ request.uri }}" method="post">
+            <input type="hidden" name="pic_title" value="{{ pictures['pic_title'] }}">
+            <button type="submit">删除</button>
+            {% module xsrf_form_html() %}
+        </form>
+        {% end %}
+    </div>
+    <footer>
+        <p><a href="/pics">PIC</a><span>&nbsp;&nbsp;</span><a href="/items">ITEMS</a> <br>
+            Copyright &copy; 2014 OMENGYE</p>
+    </footer>
+</body>
+</html>

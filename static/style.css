@@ -1,0 +1,98 @@
+body, html {
+font:300 18px/33px 'Merriweather', Georgia, serif;
+color:#404040;
+}
+
+li{list-style-type:none}
+
+a {
+text-decoration:none;
+color:#259286;
+font-weight:700;
+}
+
+.header {
+display:block;
+width:100px;
+margin:0 auto;
+font-size:30px;
+padding:0 0 20px 0;
+text-align:center;
+<!--border-style: solid;-->
+<!--border-color: black;-->
+}
+
+hi a:hover, a:focus {
+color:#092832;
+}
+
+.archive {
+display:block;
+width:600px;
+margin:0 auto;
+padding:0 20px;
+margin-bottom:30px;
+border-bottom:1px solid #efefef;
+padding-bottom:10px;
+<!--border-style: solid;-->
+<!--border-color: black;-->
+}
+
+.pic {
+display:block;
+width:600px;
+margin:0 auto;
+padding:0 20px;
+margin-bottom:30px;
+border-bottom:1px solid #efefef;
+padding-bottom:150px;
+<!--border-style: solid;-->
+<!--border-color: black;-->
+}
+
+.leftDiv { width:470px; float:left;}
+.rightDiv { width:40px; float:right;}
+
+.pictitle {
+padding:0 0 0 20px
+}
+
+.date {
+font:400 12px/1.1 "Open Sans", "Helvetica Neue", Helvetica, sans-serif;
+color:#999;
+}
+
+.date strong {
+font-weight:400;
+color:#727272;
+}
+
+h1 {
+font-family:"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-weight:700;
+letter-spacing:-1px;
+line-height:1.1;
+font-size:20px;
+color:#092832;
+}
+h1 a {
+color:#092832;
+}
+h1 a:hover, h1 a:focus {
+color:#259286;
+}
+
+.content {
+padding:20px
+}
+
+footer {
+font-family:"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-weight:400;
+color:#727272;
+font-size:12px;
+margin:50px auto;
+display:block;
+width:600px;
+text-align:center;
+}
