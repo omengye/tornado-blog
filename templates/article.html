@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <title>{{ item.title }}</title>
     <link href="/static/style.css" rel="stylesheet" type="text/css"/>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$', '$$'], ["\\[", "\\]"] ],
+          processEscapes: true
+        },
+        TeX: {
+          equationNumbers: {
+            autoNumber: 'AMS'
+          }
+        },
+        'HTML-CSS': {
+          imageFont: null
+        }
+    });
+    </script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </head>
 <body>
     <div class="header">
@@ -23,4 +41,5 @@
             Copyright &copy; 2014 OMENGYE</p>
     </footer>
 </body>
+
 </html>
