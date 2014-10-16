@@ -2,7 +2,7 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>Edit Pics</title>
+    <title>blog demo</title>
     <link href='http://fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic' rel='stylesheet'>
     <link href="/static/style.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -12,20 +12,17 @@
         <a href="/">Index</a>
     </div>
     <div style="text-align:center">
-        <p><a href="/file">New Pics</a></p>
+        Tag: {{tag}}
     </div>
-    {% for picture in pictures %}
-    <div class="pic">
+    {% for entry in entries %}
+    <div class="archive">
         <ul>
             <li>
-                <div class="leftDiv">
-                    <div class="pictitle">{{ picture.pic_name }}</div>
-                    <a href="http://{{ picture.bucket }}.qiniudn.com/{{ picture.pic_title }}">
-                        <img src="http://{{ picture.bucket }}.qiniudn.com/{{ picture.pic_title }}" width="100px" height="100px" />
-                    </a>
-                </div>
-                <div class="rightDiv">
-                    <a href="/file?id={{ picture.id }}">修改</a>
+                <div>
+                    <h1><a href="/items/{{ entry.slug }}">{{ entry.title }}</a></h1>
+                    <div class="date">
+                        Published on <strong>{{ locale.format_date(entry.published, full_format=True, shorter=True) }}</strong>
+                    </div>
                 </div>
             </li>
         </ul>
@@ -34,13 +31,13 @@
     {% if page %}
     <div class="pagination">
         {% if previous %}
-        <a href="/pics?p={{ previous }}">&laquo;</a>
-        <a href="/pics?p={{ previous }}">{{ previous }}</a>
+        <a href="/?p={{ previous }}">&laquo;</a>
+        <a href="/?p={{ previous }}">{{ previous }}</a>
         {% end %}
-        <a href="/pics?p={{ page }}" style="color:black">{{ page }}</a>
+        <a href="/?p={{ page }}" style="color:black">{{ page }}</a>
         {% if next %}
-        <a href="/pics?p={{ next }}">{{ next }}</a>
-        <a href="/pics?p={{ next }}">&raquo;</a>
+        <a href="/?p={{ next }}">{{ next }}</a>
+        <a href="/?p={{ next }}">&raquo;</a>
         {% end %}
     </div>
     {% end %}

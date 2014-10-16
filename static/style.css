@@ -10,6 +10,10 @@ text-decoration:none;
 color:#259286;
 font-weight:700;
 }
+.tags {
+text-align:center;
+font-size:10px;
+}
 
 .header {
 display:block;
@@ -48,6 +52,10 @@ border-bottom:1px solid #efefef;
 padding-bottom:150px;
 <!--border-style: solid;-->
 <!--border-color: black;-->
+}
+
+.pagination {
+text-align: center;
 }
 
 .leftDiv { width:470px; float:left;}
@@ -96,3 +104,14 @@ display:block;
 width:600px;
 text-align:center;
 }
+
+.tag_box {
+    padding:3px 6px;
+    margin:5px;
+    background:#eee;
+    color:#005F6B;
+    border-radius:3px;
+}
+.tag_box span {
+    vertical-align:super;
+    font-size:0.8em;

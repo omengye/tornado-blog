@@ -17,6 +17,9 @@
             <div style="text-align:center">
                 <textarea name="markdown" rows="25" cols="30" placeholder="内容">{{ entry['markdown'] if entry else '' }}</textarea>
             </div>
+            <div>
+                <input name="tags" type="text" style="width:410px;" value="{{ tags if tags else '' }}" placeholder="标签,使用空格间隔" />
+            </div>
             <div style="padding:0 0 0 8px">
                 <button type="submit">提交</button>
                 &nbsp;
@@ -32,7 +35,8 @@
         {% end %}
     </div>
     <footer>
-        <p><a href="/pics">PIC</a><span>&nbsp;&nbsp;</span><a href="/items">ITEMS</a> <br>
+        <p><a href="/tags">TAGS</a><span>&nbsp;&nbsp;</span><a href="/pics">PIC</a>
+            <span>&nbsp;&nbsp;</span><a href="/items">ITEMS</a> <br>
             Copyright &copy; 2014 OMENGYE</p>
     </footer>
 </body>

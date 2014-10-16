@@ -2,23 +2,28 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>Pic</title>
+    <title>blog demo</title>
+    <link href='http://fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic' rel='stylesheet'>
     <link href="/static/style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
+<div class="site">
     <div class="header">
         <a href="/">Index</a>
     </div>
-    <div class="archive" style="text-align:center">
-        {{ filename }} <br>
-        {{ pic_name }}<br>
-        <img src="http://{{ bucket }}.qiniudn.com/{{ filename }}" width="160px" height="160px" /> <br>
-        内容<br> {{ pic_details }}
+    <div style="text-align:center;padding:0 0 30px 0">
+        All Tags
+    </div>
+    <div class="archive">
+        {% for tag in tags %}
+            <a href="/tag/{{ tag.tag_name }}" class="tag_box">{{ tag.tag_name }}<span>{{ tag.num }}</span></a>
+        {% end %}
     </div>
     <footer>
         <p><a href="/tags">TAGS</a><span>&nbsp;&nbsp;</span><a href="/pics">PIC</a>
             <span>&nbsp;&nbsp;</span><a href="/items">ITEMS</a> <br>
             Copyright &copy; 2014 OMENGYE</p>
     </footer>
+</div>
 </body>
 </html>

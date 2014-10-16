@@ -35,8 +35,22 @@
         </ul>
     </div>
     {% end %}
+    {% if page %}
+    <div class="pagination">
+        {% if previous %}
+        <a href="/items?p={{ previous }}">&laquo;</a>
+        <a href="/items?p={{ previous }}">{{ previous }}</a>
+        {% end %}
+        <a href="/items?p={{ page }}" style="color:black">{{ page }}</a>
+        {% if next %}
+        <a href="/items?p={{ next }}">{{ next }}</a>
+        <a href="/items?p={{ next }}">&raquo;</a>
+        {% end %}
+    </div>
+    {% end %}
     <footer>
-        <p><a href="/pics">PIC</a><span>&nbsp;&nbsp;</span><a href="/items">ITEMS</a> <br>
+        <p><a href="/tags">TAGS</a><span>&nbsp;&nbsp;</span><a href="/pics">PIC</a>
+            <span>&nbsp;&nbsp;</span><a href="/items">ITEMS</a> <br>
             Copyright &copy; 2014 OMENGYE</p>
     </footer>
 </div>

@@ -5,7 +5,7 @@ import tornado.httpserver
 import tornado.ioloop
 import os
 import json
-from database import DataBase, DateTimeEncoder
+from database import DataBase, DateTimeEncoder, Paginator
 from DoubanLoginAuth import DoubanOAuth2Mixin
 import tornado.auth
 import tornado.httputil
@@ -36,20 +36,22 @@ class Application(tornado.web.Application):
             (r"/file", UploadFileHandler),
             (r"/pics$", EditPicsHandler),
             (r"/delete/file", DeleteFileHandler),
+            (r"/tag/([^/]+)", TagHandler),
+            (r"/tags$", TagsHandler),
             ]
 
         settings = dict(
             blog_title = "test tornado blog",
             template_path = os.path.join(os.path.dirname(__file__), "templates"),
             static_path=os.path.join(os.path.dirname(__file__), "static"),
-            douban_api_key='请填入豆瓣api key',
-            douban_api_secret='请填入豆瓣api secret',
+            douban_api_key='请填入豆瓣api key'
+            douban_api_secret='请填入豆瓣api secret'
             redirect_uri='http://127.0.0.1:8000/auth/login',    # 修改回调地址
-            cookie_secret="bZBc2sEbQLKqv7GkJD/VB8YuTC3eC0R0kRvJ5/xX37P=",   # 请生成随机值
+            cookie_secret="bZBc2sEbQLKqv7GkJD/VB8YuTC3eC0R0kRvJ5/xX37P=",
             xsrf_cookies=True,
-            qiniu_access_key="请填入qiniu access key",
-            qiniu_secret_key="请填入qiniu secret key",
-            qiniu_policy="请填入qiniu bucket",
+            qiniu_access_key="请填入qiniu access key"
+            qiniu_secret_key="请填入qiniu secret key"
+            qiniu_policy="请填入qiniu bucket"
             login_url="/auth/login",
             debug=True,
             )
@@ -85,20 +87,33 @@ class AuthLoginHandler(DoubanOAuth2Mixin, tornado.web.RequestHandler):
 
 class ApiHandler(DataBase):
     def get(self):
-        posts = self.database.query("SELECT * FROM entries")
-        home_json = json.dumps(posts, indent=4, cls=DateTimeEncoder)
-        self.set_header("Content-Type", "application/json")
-        self.write(home_json)
+        p = self.get_argument('p', 1)
+        p = int(p)
+        page_size = 5   # 每页显示5条
+        if p > 0:
+            posts = self.database.query("SELECT * FROM entries ORDER BY published DESC "
+                                        "LIMIT %s, %s", (p-1)*page_size, p*page_size)
+            home_json = json.dumps(posts, indent=4, cls=DateTimeEncoder)
+            self.set_header("Content-Type", "application/json")
+            self.write(home_json)
 
 class HomeHandler(DataBase):
     def get(self):
-        # self.write("hello world! <br> welcome " + self.current_user + " !")
-        entries = self.database.query("SELECT * FROM entries ORDER BY published "
-                                "DESC")
-        if not entries:
+        p = self.get_argument('p', 1)
+        p = int(p)
+        # entries = self.database.query("SELECT * FROM entries ORDER BY published DESC")
+        number = self.database.query("select count(*) from entries")
+        total = int(number[0]['count(*)'])
+        if total == 0:
             self.redirect("/edit")
             return
-        self.render("index.html", entries=entries)
+        elif p >0 :
+            paginator = Paginator()
+            page_size = 5
+            pages, next, previous = paginator.page_renders(page=p, page_size=page_size, total=total)
+            entries = self.database.query("SELECT * FROM entries ORDER BY published DESC "
+                                        "LIMIT %s, %s", (p-1)*page_size, p*page_size)
+            self.render("index.html", entries=entries, pages=pages, next=next, previous=previous, page=p)
 
 class ItemsHandler(DataBase):
     def get(self, slug):
@@ -109,29 +124,43 @@ class ItemsHandler(DataBase):
             # self.set_header("Content-Type", "application/json")
             # item_json = json.dumps(item, indent=4, cls=DateTimeEncoder)
         else:
-            self.render('article.html', item=item)
+            tags = self.database.query("SELECT tag_name FROM tags WHERE article_id = %s", int(item['id']))
+            self.render('article.html', item=item, tags=tags)
 
 class EditItemsHandler(DataBase):
     @tornado.web.authenticated
     def get(self):
-        entries = self.database.query("SELECT * FROM entries ORDER BY published "
-                                      "DESC")
-        self.render('edititems.html', entries=entries)
+        p = self.get_argument('p', 1)
+        p = int(p)
+        number = self.database.query("select count(*) from entries")
+        total = int(number[0]['count(*)'])
+        if total == 0:
+            self.redirect("/edit")
+            return
+        elif p >0 :
+            paginator = Paginator()
+            page_size = 5
+            pages, next, previous = paginator.page_renders(page=p, page_size=page_size, total=total)
+            entries = self.database.query("SELECT * FROM entries ORDER BY published DESC "
+                                          "LIMIT %s, %s", (p-1)*page_size, p*page_size)
+            self.render("edititems.html", entries=entries, pages=pages, next=next, previous=previous, page=p)
+
 
 class EditHandler(DataBase):
     @tornado.web.authenticated
     def get(self):
-        entry = None
+        entry, tags = None, None
         item_id = self.get_argument("id", None)
         if item_id:
-            entry = self.database.get("SELECT * FROM entries WHERE id = %s", item_id)
+            entry = self.database.get("SELECT * FROM entries WHERE id = %s", int(item_id))
+            tags = self.get_tags(item_id)
             if entry:
                 # self.set_header("Content-Type", "text/html")
-                self.render("edit.html", entry=entry)
+                self.render("edit.html", entry=entry, tags=tags)
             else:
                 raise tornado.web.HTTPError(404)
         else:
-            self.render("edit.html", entry=entry)
+            self.render("edit.html", entry=entry, tags=tags)
 
     @tornado.web.authenticated
     def post(self):
@@ -139,17 +168,21 @@ class EditHandler(DataBase):
         title = self.get_argument("title")
         text = self.get_argument("markdown")
         html = markdown.markdown(text)
+        tags = self.get_argument('tags')
+        tags = [tag.strip() for tag in tags.split(" ")]
         if id:
             entry = self.database.get("SELECT * FROM entries WHERE id = %s", int(id))
             if not entry:
                 raise tornado.web.HTTPError(404)
+            self.database.execute("DELETE FROM tags WHERE article_id=%s", int(id))   # 修改tag,采用先删后添加的方法,由于mysql表的原因,暂时想不到好办法
+            for tag in tags:
+                self.database.execute("INSERT INTO tags (tag_name,article_id) VALUES (%s,%s)", tag, int(id))
             slug = entry.slug
             self.database.execute(
                 "UPDATE entries SET title = %s, markdown = %s, html = %s "
                 "WHERE id = %s", title, text, html, int(id))
         else:
-            slug = unicodedata.normalize("NFKD", title).encode(
-                "ascii", "ignore")
+            slug = unicodedata.normalize("NFKD", title).encode("ascii", "ignore")
             slug = re.sub(r"[^\w]+", " ", slug)
             slug = "-".join(slug.lower().strip().split())
             if not slug:
@@ -163,6 +196,11 @@ class EditHandler(DataBase):
                 "INSERT INTO entries (author,title,slug,markdown,html,"
                 "published) VALUES (%s,%s,%s,%s,%s,UTC_TIMESTAMP())",
                 str(self.current_user), title, slug, text, html)
+            id = self.database.get("SELECT id FROM entries WHERE slug=%s", slug)['id']
+            print(id)
+            for tag in tags:
+                self.database.execute("INSERT INTO tags (tag_name,article_id) VALUES (%s,%s)", tag, int(id))
+
         self.redirect("/items/" + slug)
 
 class DeleteItemsHandler(DataBase):
@@ -170,6 +208,7 @@ class DeleteItemsHandler(DataBase):
     def post(self):
         id = self.get_argument('id', None)
         if id:
+            self.database.execute("DELETE FROM tags WHERE article_id=%s", int(id))
             self.database.execute("DELETE FROM entries WHERE id = %s", int(id))
             self.write("delete success<br>"
                        "<a href='/items'>返回</a>")
@@ -256,12 +295,20 @@ class UploadFileHandler(DataBase):
 class EditPicsHandler(DataBase):
     @tornado.web.authenticated
     def get(self):
-        pictures = self.database.query("SELECT * FROM pictures ORDER BY published "
-                                      "DESC")
-        if pictures:
-            self.render('pics.html', pictures=pictures)
-        else:
-            self.redirect('/file')
+        p = self.get_argument('p', 1)
+        p = int(p)
+        number = self.database.query("select count(*) from pictures")
+        total = int(number[0]['count(*)'])
+        if total == 0:
+            self.redirect("/file")
+            return
+        elif p >0 :
+            paginator = Paginator()
+            page_size = 5
+            pages, next, previous = paginator.page_renders(page=p, page_size=page_size, total=total)
+            pictures = self.database.query("SELECT * FROM pictures ORDER BY published DESC "
+                                          "LIMIT %s, %s", (p-1)*page_size, p*page_size)
+            self.render("pics.html", pictures=pictures, pages=pages, next=next, previous=previous, page=p)
 
 class DeleteFileHandler(DataBase):
     @tornado.web.authenticated
@@ -283,6 +330,29 @@ class DeleteFileHandler(DataBase):
                            "<a href='/pics'>返回</a>")
         else:
             raise tornado.web.HTTPError(404)
+
+class TagHandler(DataBase):
+    def get(self, tag):
+        p = self.get_argument('p', 1)
+        if tag:
+            number = self.database.query("SELECT count(*) FROM tags WHERE tag_name = %s", tag)
+            total = int(number[0]['count(*)'])
+            if p >0 :
+                id = self.database.query("SELECT article_id from tags WHERE tag_name = %s", tag)
+                item_id = tuple([i['article_id'] for i in id])
+                paginator = Paginator()
+                page_size = 5
+                pages, next, previous = paginator.page_renders(page=p, page_size=page_size, total=total)
+                entries = self.database.query("SELECT * FROM entries where id in %s "
+                                              "ORDER BY published DESC LIMIT %s, %s",
+                                              item_id, (p-1)*page_size, p*page_size)
+                self.render("tag.html", entries=entries, pages=pages, next=next, previous=previous, page=p, tag=tag)
+
+class TagsHandler(DataBase):
+    def get(self):
+        tags = self.database.query("SELECT tag_name, COUNT(tag_name) AS num FROM tags "
+                                   "GROUP BY tag_name ORDER BY num DESC")
+        self.render('tags.html', tags=tags)
 
 def main():
     tornado.options.parse_command_line()

@@ -1,4 +1,4 @@
-###简易的tornado blog，采用douban oauth2 登录，附带了一个可上传图片至qiniu云的功能，未完成，还差分页、标签和前端优化
+###简易的tornado blog，采用douban oauth2 登录，附带了一个可上传图片至qiniu云的功能，功能已完成，还差后端代码优化和前端优化
 ####见 [demo](http://mytornadoblog.coding.io/)
 ####index.py里  
 
@@ -50,4 +50,14 @@
 	)
 	COLLATE='utf8_general_ci'
 	ENGINE=InnoDB;
+
+	CREATE TABLE `tags` (
+		`id` INT(11) NOT NULL AUTO_INCREMENT,
+		`tag_name` VARCHAR(50) NOT NULL DEFAULT '0',
+		`article_id` INT(11) NOT NULL DEFAULT '0',
+		PRIMARY KEY (`id`)
+	)
+	COLLATE='utf8_general_ci'
+	ENGINE=InnoDB
+
 
