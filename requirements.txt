@@ -1,4 +1,4 @@
-tornado==4.0.2
+tornado==6.4.1
 torndb==0.3
 Markdown==2.5.1
 MySQL-python==1.2.5
